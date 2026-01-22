@@ -1,4 +1,11 @@
 # .gitignore
+# ---------------------------------------------------------
+# NEVER remove these - they protect your private identity
+# ---------------------------------------------------------
 .mygit-identity/
-*.log
+.ssh/
+
+# System files
 .DS_Store
+*.log
+tmp/

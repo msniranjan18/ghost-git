@@ -1,12 +1,25 @@
 #!/bin/bash
 
-# --- Configuration ---
-IDENTITY_DIR="$HOME/.mygit-identity"
-# Automatically detects the first key found in your identity folder
-KEY_PATH=$(find "$IDENTITY_DIR/.ssh" -type f \( -name "id_rsa" -o -name "id_ed25519" \) | head -n 1)
-ALIAS_NAME="mygit-ssh"
+# --- Robust Path Detection ---
+# This works for both bash and zsh, and both sourcing and executing
+if [ -n "$BASH_SOURCE" ]; then
+    CURRENT_SCRIPT_PATH="${BASH_SOURCE[0]}"
+elif [ -n "$ZSH_VERSION" ]; then
+    CURRENT_SCRIPT_PATH="${(%):-%N}"
+else
+    CURRENT_SCRIPT_PATH="$0"
+fi
 
-echo "🔑 Initializing GhostGit Session..."
+SCRIPT_DIR="$( cd "$( dirname "$CURRENT_SCRIPT_PATH" )" && pwd )"
+REPO_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
+IDENTITY_DIR="$REPO_ROOT/.mygit-identity"
+
+# --- Configuration ---
+ALIAS_NAME="mygit-ssh"
+KEY_PATH=$(find "$IDENTITY_DIR/.ssh" -type f \( -name "id_rsa" -o -name "id_ed25519" \) 2>/dev/null | head -n 1)
+
+echo "Initializing GhostGit Session..."
+echo "Identity Root: $IDENTITY_DIR"
 
 # 1. Validation
 if [ ! -f "$KEY_PATH" ]; then
@@ -30,18 +43,29 @@ ssh-add "$KEY_PATH"
 trap "echo 'Killing GhostGit SSH Agent...'; ssh-agent -k" EXIT
 
 # 5. Define Alias for this Session
-# We use 'export' and 'alias' so the current terminal window is ready to go
-export MYGIT_SSH_CMD="docker run --rm -it \
-  -v \$(pwd):/git \
-  -v $IDENTITY_DIR/.gitconfig:/root/.gitconfig:ro \
-  -v \$SSH_AUTH_SOCK:/ssh-agent \
-  -e SSH_AUTH_SOCK=/ssh-agent \
-  alpine/git"
+# We use single quotes for the alias to ensure it handles arguments correctly
+#alias mygit-ssh="docker run --rm -it --user 0:0 -v \"\$(pwd):/git\" -v \"$IDENTITY_DIR/.gitconfig:/root/.gitconfig:ro\" -v /run/host-services/ssh-auth.sock:/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent -e GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' alpine/git"
+# --- Detect the correct SSH Socket path ---
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS: Use the Docker Desktop bridge
+    AGENT_SOCK="/run/host-services/ssh-auth.sock"
+else
+    # Linux / WSL: Use the standard environment variable path
+    AGENT_SOCK="$SSH_AUTH_SOCK"
+fi
 
-alias $ALIAS_NAME="$MYGIT_SSH_CMD"
+# --- Define the Cross-Platform Alias ---
+alias mygit-ssh='docker run --rm -it --user 0:0 \
+  -v "$(pwd):/git" \
+  -v "'$IDENTITY_DIR'/.gitconfig:/root/.gitconfig:ro" \
+  -v "'$AGENT_SOCK':/ssh-agent" \
+  -e SSH_AUTH_SOCK=/ssh-agent \
+  -e GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+  alpine/git'
 
 echo "--------------------------------------------------------"
 echo "Identity Loaded: $(git config -f $IDENTITY_DIR/.gitconfig user.email)"
 echo "Command Ready: $ALIAS_NAME <git command>"
 echo "Note: This session and agent will auto-destruct on exit."
+echo "type exit to close the session"
 echo "--------------------------------------------------------"

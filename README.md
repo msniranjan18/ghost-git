@@ -17,6 +17,7 @@ Working on shared laptops (e.g., pair programming, office "hot desks") often lea
  - *Auto-Cleanup:* SSH agents are killed automatically when you exit the terminal.
  - *Zero Pollution:* Does not modify the host's global Git settings.
 
+
 ### Setup
 #### 1. Clone & Initialize
 
@@ -35,6 +36,14 @@ Copy your private keys into the hidden identity folder:
 cp ~/.ssh/id_ed25519 .mygit-identity/.ssh/
 ```
 
+For new key generation:
+
+```bash
+ssh-keygen -t ed25519 -f  <absolute path of ghost-git/.mygit-identity/.ssh/id_ed25519>/.ssh/id_ed25519 -C <your-git-email-id>
+```
+Add this key to github: GitHub → Profile → Settings → SSH and GPG keys → New SSH key → Paste id_ed25519.pub key
+
+
 ###  Usage
 #### Standard Mode
 For quick commands (will ask for SSH passphrase if applicable):
@@ -52,6 +61,7 @@ This starts a "Stealth Agent" that kills itself when the window is closed:
 source scripts/session.sh
 mygit-ssh push
 ```
+
 
 ### Security
 - *Read-Only:* The container mounts your identity folder as readonly.

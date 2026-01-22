@@ -10,7 +10,7 @@ echo "🔑 Initializing GhostGit Session..."
 
 # 1. Validation
 if [ ! -f "$KEY_PATH" ]; then
-    echo "❌ Error: No private key found in $IDENTITY_DIR/.ssh/"
+    echo "Error: No private key found in $IDENTITY_DIR/.ssh/"
     echo "Please ensure your key (id_rsa or id_ed25519) is in the folder."
     # Use return instead of exit so it doesn't close the user's terminal if sourced
     return 1 2>/dev/null || exit 1
@@ -27,7 +27,7 @@ ssh-add "$KEY_PATH"
 
 # 4. The "Logout Guard" (Cleanup Logic)
 # This kills the agent process as soon as the terminal session ends
-trap "echo '🛑 Killing GhostGit SSH Agent...'; ssh-agent -k" EXIT
+trap "echo 'Killing GhostGit SSH Agent...'; ssh-agent -k" EXIT
 
 # 5. Define Alias for this Session
 # We use 'export' and 'alias' so the current terminal window is ready to go
@@ -41,7 +41,7 @@ export MYGIT_SSH_CMD="docker run --rm -it \
 alias $ALIAS_NAME="$MYGIT_SSH_CMD"
 
 echo "--------------------------------------------------------"
-echo "✅ Identity Loaded: $(git config -f $IDENTITY_DIR/.gitconfig user.email)"
-echo "🚀 Command Ready: $ALIAS_NAME <git command>"
-echo "🔒 Note: This session and agent will auto-destruct on exit."
+echo "Identity Loaded: $(git config -f $IDENTITY_DIR/.gitconfig user.email)"
+echo "Command Ready: $ALIAS_NAME <git command>"
+echo "Note: This session and agent will auto-destruct on exit."
 echo "--------------------------------------------------------"

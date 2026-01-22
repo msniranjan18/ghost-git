@@ -1,0 +1,4 @@
+# .gitignore
+.mygit-identity/
+*.log
+.DS_Store

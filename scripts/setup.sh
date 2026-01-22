@@ -45,11 +45,9 @@ if [ -z "$(ls -A $IDENTITY_DIR/.ssh)" ]; then
 fi
 
 # 4. Define the Alias Logic (Using the local path)
-DOCKER_RUN_CMD="docker run --rm -it \\
-  -v \$(pwd):/git \\
-  -v $IDENTITY_DIR/.gitconfig:/root/.gitconfig:ro \\
-  -v $IDENTITY_DIR/.ssh:/root/.ssh:ro \\
-  $GIT_IMAGE"
+# We add -e GIT_SSH_COMMAND to bypass the 'known_hosts' write error
+# We add --user 0:0 to ensure the container can read the mounted keys
+DOCKER_RUN_CMD='docker run --rm -it --user 0:0 -v "$(pwd):/git" -v "/Users/manvendra/WORK-DIR/POC/ghost-git/.mygit-identity/.gitconfig:/root/.gitconfig:ro" -v "/Users/manvendra/WORK-DIR/POC/ghost-git/.mygit-identity/.ssh:/root/.ssh:ro" -e GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" alpine/git'
 
 # 5. Detect Shell and Add Alias
 SHELL_RC=""

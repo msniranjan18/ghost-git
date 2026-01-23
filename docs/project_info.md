@@ -59,6 +59,6 @@ Inside the container, you can run:
 |------------------------|------------------------------------------|
 | Default Folder | Look for WORKDIR in the [Official Docker Hub Page](https://hub.docker.com/r/alpine/git) or use docker inspect. |
 | Default User | Look for `USER` in the Dockerfile. If blank, it is root. |
-| Available Tools | Run `docker run --rm alpine/git ls /usr/bin` to see what programs (like `ssh` or `tar`) are installed. |
+| Available Tools | Run `docker run -it --rm --entrypoint sh alpine/git -c "ls /usr/bin"` to see what programs (like `ssh` or `tar`) are installed. |
 
 

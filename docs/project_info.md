@@ -57,8 +57,8 @@ Inside the container, you can run:
 ## Summary of Critical Info Locations
 | What you want to know | Where to look |
 |------------------------|------------------------------------------|
-| Default Folder | Look for WORKDIR in the Official Docker Hub Page or use docker inspect. |
-| Default User | Look for USER in the Dockerfile. If blank, it is root. |
-| Available Tools | Run docker run --rm alpine/git ls /usr/bin to see what programs (like ssh or tar) are installed. |
+| Default Folder | Look for WORKDIR in the [Official Docker Hub Page](https://hub.docker.com/r/alpine/git) or use docker inspect. |
+| Default User | Look for `USER` in the Dockerfile. If blank, it is root. |
+| Available Tools | Run `docker run --rm alpine/git ls /usr/bin` to see what programs (like `ssh` or `tar`) are installed. |
 
 

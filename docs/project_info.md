@@ -39,7 +39,8 @@ To know why we mount keys into /root/.ssh, we look for the User and Env variable
 2. User: If the image doesn't specify a user, it defaults to root.
 3. Home Environment: In Linux, the root user's "Home" is always /root. SSH is hardcoded to look for keys in ~/.ssh (which expands to /root/.ssh for the root user).
 
-### How to verify this yourself (The "Explorer" Method)If you are ever unsure what a Docker image expects, the best way to "peek inside" is to override its command with a shell:Bash# This lets you look around inside the image without running Git
+### How to verify this yourself (The "Explorer" Method)
+If you are ever unsure what a Docker image expects, the best way to "peek inside" is to override its command with a shell:Bash# This lets you look around inside the image without running Git
 
 ```bash
 docker run --rm -it --entrypoint sh alpine/git
